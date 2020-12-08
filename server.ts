@@ -296,5 +296,5 @@ async function updateItems(): Promise<void> {
 
 (async () => {
   await updateItems();
-  cron.schedule("0 * * * *", updateItems);
+  cron.schedule("0 10-20/1 * * *", updateItems);
 })();
