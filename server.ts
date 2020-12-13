@@ -250,9 +250,6 @@ async function updateItems(): Promise<void> {
     console.log(itemUpdates);
     if (itemUpdates.length === 0) {
       console.log("No updates to post");
-      await sendSlackMessage(process.env.WEBHOOK_URL, {
-        text: "Checked inventory, no update to post",
-      });
       return;
     }
 
@@ -305,7 +302,7 @@ async function updateItems(): Promise<void> {
 (async () => {
   try {
     await updateItems();
-    cron.schedule("0 10-20/1 * * *", updateItems);
+    cron.schedule("*/25 10-20 * * *", updateItems);
   } catch (e) {
     console.error(e);
     await sendSlackMessage(
