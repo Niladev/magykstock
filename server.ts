@@ -192,109 +192,125 @@ async function getInventoryDetails(variantIds: string[]): Promise<any[]> {
 }
 
 async function updateItems(): Promise<void> {
-  const [squarespaceItems, loyverseItems] = await Promise.all([
-    getSquarespaceItems(),
-    getLoyverseItems(),
-  ]);
+  try {
+    const [squarespaceItems, loyverseItems] = await Promise.all([
+      getSquarespaceItems(),
+      getLoyverseItems(),
+    ]);
 
-  //   console.log(squarespaceItems.forEach((item) => console.log(item)));
-  //   console.log(squarespaceItems.length);
-  const filteredItems = [];
-  loyverseItems.forEach((lItem: Item) => {
-    const item = squarespaceItems.find(
-      (sItem: Item) => sItem.sku.toUpperCase() === lItem.sku.toUpperCase()
-    );
+    //   console.log(squarespaceItems.forEach((item) => console.log(item)));
+    //   console.log(squarespaceItems.length);
+    const filteredItems = [];
+    loyverseItems.forEach((lItem: Item) => {
+      const item = squarespaceItems.find(
+        (sItem: Item) => sItem.sku.toUpperCase() === lItem.sku.toUpperCase()
+      );
 
-    if (item) {
-      filteredItems.push({
-        lVariantId: lItem.variantId,
-        sku: item.sku,
-        sVariantId: item.variantId,
-        sQuantity: item.quantity,
-        name: item.name,
-        imageUrl: lItem.imageUrl,
-      });
-    }
+      if (item) {
+        filteredItems.push({
+          lVariantId: lItem.variantId,
+          sku: item.sku,
+          sVariantId: item.variantId,
+          sQuantity: item.quantity,
+          name: item.name,
+          imageUrl: lItem.imageUrl,
+        });
+      }
 
-    return squarespaceItems.find(
-      (sItem: Item) => sItem.sku.toUpperCase() === lItem.sku.toUpperCase()
-    );
-  });
-
-  const variantIds = filteredItems.map((item) => item.lVariantId);
-
-  const inventoryData = await getInventoryDetails(variantIds);
-
-  const itemUpdates = [];
-
-  filteredItems.forEach((fItem) => {
-    const foundItem = inventoryData.find((item) => {
-      return (
-        item.variant_id === fItem.lVariantId &&
-        item.in_stock !== fItem.sQuantity
+      return squarespaceItems.find(
+        (sItem: Item) => sItem.sku.toUpperCase() === lItem.sku.toUpperCase()
       );
     });
 
-    if (foundItem) {
-      itemUpdates.push({
-        name: fItem.name,
-        quantity: foundItem.in_stock,
-        variantId: fItem.sVariantId,
-        prevQuantity: fItem.sQuantity,
-        imageUrl: fItem.imageUrl,
+    const variantIds = filteredItems.map((item) => item.lVariantId);
+
+    const inventoryData = await getInventoryDetails(variantIds);
+
+    const itemUpdates = [];
+
+    filteredItems.forEach((fItem) => {
+      const foundItem = inventoryData.find((item) => {
+        return (
+          item.variant_id === fItem.lVariantId &&
+          item.in_stock !== fItem.sQuantity
+        );
       });
-    }
-  });
-  console.log(filteredItems);
-  console.log(itemUpdates);
-  if (itemUpdates.length === 0) {
-    console.log("No updates to post");
-    await sendSlackMessage(process.env.WEBHOOK_URL, {
-      text: "Checked inventory, no update to post",
+
+      if (foundItem) {
+        itemUpdates.push({
+          name: fItem.name,
+          quantity: foundItem.in_stock,
+          variantId: fItem.sVariantId,
+          prevQuantity: fItem.sQuantity,
+          imageUrl: fItem.imageUrl,
+        });
+      }
     });
-    return;
-  }
-
-  const idKey = uuidv4();
-
-  const body = JSON.stringify({
-    setFiniteOperations: itemUpdates.map((item) => ({
-      quantity: item.quantity,
-      variantId: item.variantId,
-    })),
-  });
-
-  console.log(body);
-
-  const updateRes = await nFetch(
-    "https://api.squarespace.com/1.0/commerce/inventory/adjustments",
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.SQUARE_API_KEY}`,
-        "Content-Type": "application/json",
-        "Idempotency-Key": idKey,
-      },
-      method: "POST",
-      body,
+    console.log(filteredItems);
+    console.log(itemUpdates);
+    if (itemUpdates.length === 0) {
+      console.log("No updates to post");
+      await sendSlackMessage(process.env.WEBHOOK_URL, {
+        text: "Checked inventory, no update to post",
+      });
+      return;
     }
-  );
 
-  if (updateRes.status > 300) {
-    console.log(`Failed update ${updateRes.status}`);
-    const body = await updateRes.json();
-    console.log(`Response body - ${body}`);
+    const idKey = uuidv4();
+
+    const body = JSON.stringify({
+      setFiniteOperations: itemUpdates.map((item) => ({
+        quantity: item.quantity,
+        variantId: item.variantId,
+      })),
+    });
+
+    console.log(body);
+
+    const updateRes = await nFetch(
+      "https://api.squarespace.com/1.0/commerce/inventory/adjustments",
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.SQUARE_API_KEY}`,
+          "Content-Type": "application/json",
+          "Idempotency-Key": idKey,
+        },
+        method: "POST",
+        body,
+      }
+    );
+
+    if (updateRes.status > 300) {
+      console.log(`Failed update ${updateRes.status}`);
+      const body = await updateRes.json();
+      console.log(`Response body - ${body}`);
+      await sendSlackMessage(
+        process.env.WEBHOOK_URL,
+        `There was a problem updating. ${updateRes.status}, ${body}`
+      );
+    } else {
+      const slackBody = slackMessageBody(itemUpdates);
+
+      await sendSlackMessage(process.env.WEBHOOK_URL, slackBody);
+    }
+  } catch (e) {
+    console.error(e);
     await sendSlackMessage(
       process.env.WEBHOOK_URL,
-      `There was a problem updating. ${updateRes.status}, ${body}`
+      `There was a problem updating. ${e}`
     );
-  } else {
-    const slackBody = slackMessageBody(itemUpdates);
-
-    await sendSlackMessage(process.env.WEBHOOK_URL, slackBody);
   }
 }
 
 (async () => {
-  await updateItems();
-  cron.schedule("0 10-20/1 * * *", updateItems);
+  try {
+    await updateItems();
+    cron.schedule("0 10-20/1 * * *", updateItems);
+  } catch (e) {
+    console.error(e);
+    await sendSlackMessage(
+      process.env.WEBHOOK_URL,
+      `There was a problem updating. ${e}`
+    );
+  }
 })();

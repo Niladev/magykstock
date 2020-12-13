@@ -34,29 +34,6 @@ export async function sendSlackMessage(webhookURL, messageBody) {
   } else {
     console.log(req);
   }
-  // Promisify the https.request
-  return new Promise((resolve, reject) => {
-    // general request options, we defined that it's a POST request and content is JSON
-    // const req = fetch(webhookURL, requestOptions, (res) => {
-    //   let response = "";
-    //   console.log(res);
-    //   res.on("data", (d) => {
-    //     console.log("receieved data");
-    //     response += d;
-    //   });
-    //   // response finished, resolve the promise with data
-    //   res.on("end", () => {
-    //     console.log("receieved end");
-    //     resolve(response);
-    //   });
-    // });
-    // // there was an error, reject the promise
-    // req.on("error", (e) => {
-    //   console.log("receieved error");
-    //   reject(e);
-    // });
-    // // send our message body (was parsed to JSON beforehand)
-    // req.write(messageBody);
-    // req.end();
-  });
+
+  return req.ok;
 }
