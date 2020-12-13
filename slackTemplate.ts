@@ -18,7 +18,9 @@ export const slackMessageBody = (items: Item[]) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*${item.name}*\nUpdated quantity *${item.quantity}*`,
+            text: `*${item.name}*\nUpdated quantity *${
+              item.quantity !== 0 ? item.quantity : "SOLD OUT!"
+            }*`,
           },
           accessory: {
             type: "image",
