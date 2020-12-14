@@ -4,19 +4,15 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^14.14.2",
-    "@types/node-cron": "^2.0.3",
     "dotenv": "^8.2.0",
     "node-cron": "^2.0.3",
     "node-fetch": "^2.6.1",
+    "pm2": "^4.5.0",
     "prompt-sync": "^4.2.0",
     "uuid": "^8.3.1"
   },
   "scripts": {
-    "start": "ts-node server.ts"
+    "start": "pm2-runtime start ecosystem.config.js --env production"
   },
-  "devDependencies": {
-    "ts-node": "^9.1.1",
-    "typescript": "^4.0.3"
-  }
+  "devDependencies": {}
 }

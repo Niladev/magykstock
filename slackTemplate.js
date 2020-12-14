@@ -1,6 +1,4 @@
-import { Item } from "./types";
-
-export const slackMessageBody = (items: Item[]) => {
+module.exports.slackMessageBody = (items) => {
   return {
     blocks: [
       {

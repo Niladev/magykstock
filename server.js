@@ -1,29 +1,26 @@
-import { Console, error } from "console";
-
 require("dotenv").config();
 const nFetch = require("node-fetch");
 const { v4: uuidv4 } = require("uuid");
 const promptSync = require("prompt-sync")();
 const cron = require("node-cron");
-import { sendSlackMessage } from "./sendSlackMessage";
-import { slackMessageBody } from "./slackTemplate";
-import { Item } from "./types";
+const { sendSlackMessage } = require("./sendSlackMessage");
+const { slackMessageBody } = require("./slackTemplate");
 let squarespaceFullItems = [];
 let numOfRetries = 0;
 const webhookUrl = process.env.WEBHOOK_URL;
 
-const handleError = (error: Error): boolean => {
+const handleError = (error) => {
   numOfRetries += 1;
   console.log(error);
   return numOfRetries < 3;
 };
 
-async function getSquarespaceItems(): Promise<Item[]> {
-  let squarespaceItems: Item[] = [];
-  const fetchSquarespaceItems = async (cursor?: string) => {
+async function getSquarespaceItems() {
+  let squarespaceItems = [];
+  const fetchSquarespaceItems = async (cursor) => {
     try {
       console.log(`fetch squarespace items with cursor - ${cursor}`);
-      const res: Response = await nFetch(
+      const res = await nFetch(
         `https://api.squarespace.com/1.0/commerce/inventory${
           cursor ? "?cursor=" + cursor : ""
         }`,
@@ -74,11 +71,11 @@ async function getSquarespaceItems(): Promise<Item[]> {
   return squarespaceItems;
 }
 
-async function getLoyverseItems(): Promise<Item[]> {
-  let loyverseItems: Item[] = [];
-  const requestItems = async (cursor?: string) => {
+async function getLoyverseItems() {
+  let loyverseItems = [];
+  const requestItems = async (cursor) => {
     console.log(`fetch loyverse items with cursor - ${cursor}`);
-    const res: Response = await nFetch(
+    const res = await nFetch(
       `https://api.loyverse.com/v1.0/items?limit=250${
         cursor ? "&cursor=" + cursor : ""
       }`,
@@ -137,7 +134,7 @@ async function getLoyverseItems(): Promise<Item[]> {
   return loyverseItems;
 }
 
-async function getInventoryDetails(variantIds: string[]): Promise<any[]> {
+async function getInventoryDetails(variantIds) {
   let inventoryData = [];
   let maxIterations = Math.ceil(variantIds.length / 200);
   console.log(`Max iterations ${maxIterations}`);
@@ -160,10 +157,7 @@ async function getInventoryDetails(variantIds: string[]): Promise<any[]> {
       if (iRes.status >= 300) {
         throw new Error(`Response status is ${iRes.status}`);
       }
-      const iData: {
-        inventory_levels: any[];
-        cursor?: string;
-      } = await iRes.json();
+      const iData = await iRes.json();
 
       if (Array.isArray(iData.inventory_levels)) {
         return iData?.inventory_levels;
@@ -191,7 +185,7 @@ async function getInventoryDetails(variantIds: string[]): Promise<any[]> {
   return inventoryData;
 }
 
-async function updateItems(): Promise<void> {
+async function updateItems() {
   try {
     const [squarespaceItems, loyverseItems] = await Promise.all([
       getSquarespaceItems(),
@@ -201,9 +195,9 @@ async function updateItems(): Promise<void> {
     //   console.log(squarespaceItems.forEach((item) => console.log(item)));
     //   console.log(squarespaceItems.length);
     const filteredItems = [];
-    loyverseItems.forEach((lItem: Item) => {
+    loyverseItems.forEach((lItem) => {
       const item = squarespaceItems.find(
-        (sItem: Item) => sItem.sku.toUpperCase() === lItem.sku.toUpperCase()
+        (sItem) => sItem.sku.toUpperCase() === lItem.sku.toUpperCase()
       );
 
       if (item) {
@@ -218,7 +212,7 @@ async function updateItems(): Promise<void> {
       }
 
       return squarespaceItems.find(
-        (sItem: Item) => sItem.sku.toUpperCase() === lItem.sku.toUpperCase()
+        (sItem) => sItem.sku.toUpperCase() === lItem.sku.toUpperCase()
       );
     });
 

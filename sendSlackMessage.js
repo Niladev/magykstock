@@ -1,6 +1,4 @@
 "use strict";
-
-const https = require("https");
 const nFetch = require("node-fetch");
 
 /**
@@ -10,7 +8,10 @@ const nFetch = require("node-fetch");
  * @param messageBody
  * @return {Promise}
  */
-export async function sendSlackMessage(webhookURL, messageBody) {
+module.exports.sendSlackMessage = async function sendSlackMessage(
+  webhookURL,
+  messageBody
+) {
   // make sure the incoming message body can be parsed into valid JSON
   try {
     messageBody = JSON.stringify(messageBody);
@@ -36,4 +37,4 @@ export async function sendSlackMessage(webhookURL, messageBody) {
   }
 
   return req.ok;
-}
+};
