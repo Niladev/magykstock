@@ -14,5 +14,7 @@
   "scripts": {
     "start": "pm2-runtime start ecosystem.config.js --env production"
   },
-  "devDependencies": {}
+  "engines": {
+    "node": "14.12.0"
+  }
 }
