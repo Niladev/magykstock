@@ -228,14 +228,14 @@ async function updateItems() {
       const foundItem = inventoryData.find((item) => {
         return (
           item.variant_id === fItem.lVariantId &&
-          item.in_stock !== fItem.sQuantity
+          Math.max(0, item.in_stock) !== fItem.sQuantity
         );
       });
 
       if (foundItem) {
         itemUpdates.push({
           name: fItem.name,
-          quantity: foundItem.in_stock <= 0 ? 0 : foundItem.in_stock,
+          quantity: Math.max(0, item.in_stock),
           variantId: fItem.sVariantId,
           prevQuantity: fItem.sQuantity,
           imageUrl: fItem.imageUrl,
@@ -273,7 +273,7 @@ async function updateItems() {
       }
     );
 
-    if (updateRes.status > 300) {
+    if (updateRes.status !== 200) {
       console.log(`Failed update ${updateRes.status}`);
       const body = await updateRes.json();
       console.log(`Response body - ${body}`);
