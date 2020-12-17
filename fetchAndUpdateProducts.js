@@ -235,7 +235,7 @@ async function updateItems() {
       if (foundItem) {
         itemUpdates.push({
           name: fItem.name,
-          quantity: Math.max(0, item.in_stock),
+          quantity: Math.max(0, fItem.in_stock),
           variantId: fItem.sVariantId,
           prevQuantity: fItem.sQuantity,
           imageUrl: fItem.imageUrl,
