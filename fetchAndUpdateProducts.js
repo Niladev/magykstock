@@ -273,7 +273,7 @@ async function updateItems() {
       }
     );
 
-    if (updateRes.status !== 200) {
+    if (updateRes.status >= 300) {
       console.log(`Failed update ${updateRes.status}`);
       const body = await updateRes.json();
       console.log(`Response body - ${body}`);
