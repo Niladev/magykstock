@@ -1,4 +1,4 @@
-module.exports.slackMessageBody = (items) => {
+export const slackMessageBody = (items) => {
   return {
     blocks: [
       {

@@ -1,10 +1,10 @@
-require("dotenv").config();
-const nFetch = require("node-fetch");
-const { v4: uuidv4 } = require("uuid");
-const promptSync = require("prompt-sync")();
-const cron = require("node-cron");
-const { sendSlackMessage } = require("./sendSlackMessage");
-const { slackMessageBody } = require("./slackTemplate");
+import "dotenv/config";
+
+import nFetch from "node-fetch";
+import { v4 as uuidv4 } from "uuid";
+import cron from "node-cron";
+import { sendSlackMessage } from "./sendSlackMessage.js";
+import { slackMessageBody } from "./slackTemplate.js";
 let squarespaceFullItems = [];
 let numOfRetries = 0;
 const webhookUrl = process.env.WEBHOOK_URL;
@@ -15,7 +15,7 @@ const handleError = (error) => {
   return numOfRetries < 3;
 };
 
-module.exports.getUpdatedItems = () => updatedItems;
+export const getUpdatedItems = () => updatedItems;
 
 async function getSquarespaceItems() {
   let squarespaceItems = [];

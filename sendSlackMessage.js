@@ -1,5 +1,5 @@
 "use strict";
-const nFetch = require("node-fetch");
+import nFetch from "node-fetch";
 
 /**
  * Handles the actual sending request.
@@ -8,10 +8,8 @@ const nFetch = require("node-fetch");
  * @param messageBody
  * @return {Promise}
  */
-module.exports.sendSlackMessage = async function sendSlackMessage(
-  webhookURL,
-  messageBody
-) {
+
+export const sendSlackMessage = async (webhookURL, messageBody) => {
   // make sure the incoming message body can be parsed into valid JSON
   try {
     messageBody = JSON.stringify(messageBody);

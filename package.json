@@ -2,20 +2,21 @@
   "name": "magyk-stock",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "node-cron": "^2.0.3",
-    "node-fetch": "^2.6.1",
-    "pm2": "^4.5.0",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "node-cron": "^3.0.1",
+    "node-fetch": "^3.2.10",
+    "pm2": "^5.2.0",
     "prompt-sync": "^4.2.0",
-    "uuid": "^8.3.1"
+    "uuid": "^8.3.2"
   },
   "scripts": {
     "start": "pm2-runtime start ecosystem.config.js --env production"
   },
   "engines": {
-    "node": "14.12.0"
+    "node": "16.16.0"
   }
 }
