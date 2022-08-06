@@ -3,72 +3,20 @@ import "dotenv/config";
 import nFetch from "node-fetch";
 import { v4 as uuidv4 } from "uuid";
 import cron from "node-cron";
+import { fetchSquarespaceItems } from "./fetchSquareSpaceItems.js";
 import { sendSlackMessage } from "./sendSlackMessage.js";
 import { slackMessageBody } from "./slackTemplate.js";
-let squarespaceFullItems = [];
+
 let numOfRetries = 0;
 const webhookUrl = process.env.WEBHOOK_URL;
 let updatedItems = [];
-const handleError = (error) => {
-  numOfRetries += 1;
-  console.log(error);
-  return numOfRetries < 3;
-};
 
 export const getUpdatedItems = () => updatedItems;
 
 async function getSquarespaceItems() {
   let squarespaceItems = [];
-  const fetchSquarespaceItems = async (cursor) => {
-    try {
-      console.log(`fetch squarespace items with cursor - ${cursor}`);
-      const res = await nFetch(
-        `https://api.squarespace.com/1.0/commerce/inventory${
-          cursor ? "?cursor=" + cursor : ""
-        }`,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.SQUARE_API_KEY}`,
-          },
-        }
-      );
-
-      const data = await res.json();
-
-      if (res.status !== 200) {
-        const shouldRetry = handleError({
-          name: res.statusText,
-          message: data.message,
-        });
-
-        if (shouldRetry) {
-          return fetchSquarespaceItems(cursor);
-        }
-        console.log(
-          `Squarespace error: ${res.statusText} - Retried: ${numOfRetries} - Not quitting`
-        );
-        return;
-      }
-
-      if (data.inventory.length > 0) {
-        squarespaceItems = squarespaceItems.concat(
-          data.inventory.map((item) => ({
-            name: item.descriptor,
-            ...item,
-          }))
-        );
-        squarespaceFullItems = squarespaceFullItems.concat(data.inventory);
-        if (data.pagination.hasNextPage) {
-          return fetchSquarespaceItems(data.pagination.nextPageCursor);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-      await sendSlackMessage(webhookUrl, `Squarespace error: , ${e}`);
-    }
-  };
   console.log(`Requesting squarespace items`);
-  await fetchSquarespaceItems();
+  await fetchSquarespaceItems(squarespaceItems);
 
   return squarespaceItems;
 }
