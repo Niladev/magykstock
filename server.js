@@ -1,7 +1,8 @@
-require("./fetchAndUpdateProducts");
-const express = require("express");
+import "./fetchAndUpdateProducts.js";
+import express from "express";
+
 const app = express();
-const { getUpdatedItems } = require("./fetchAndUpdateProducts");
+import { getUpdatedItems } from "./fetchAndUpdateProducts.js";
 
 const port = process.env.PORT || 3000;
 
