@@ -17,6 +17,6 @@
     "start": "pm2-runtime start ecosystem.config.js --env production"
   },
   "engines": {
-    "node": "16.16.0"
+    "node": "16.17.0"
   }
 }
