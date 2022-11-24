@@ -13,6 +13,11 @@ app.get("/", (req, res) => {
   });
 });
 
+app.post("/", (req, res) => {
+  console.log(req.body);
+  res.status(200);
+});
+
 app.listen(port, () => {
   console.log("Server is running on port", port);
 });

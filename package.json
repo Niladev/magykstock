@@ -14,7 +14,7 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "start": "node server.js --env production"
+    "start": "pm2-runtime start ecosystem.config.cjs --env production"
   },
   "engines": {
     "node": "16.17.0"
