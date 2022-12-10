@@ -49,6 +49,8 @@ export const fetchLoyverseItems = async (loyverseItems, cursor) => {
         return fetchLoyverseItems(loyverseItems, data.cursor);
       }
     }
+
+    return loyverseItems;
   } catch (e) {
     console.error(e);
     await sendSlackMessage(webhookUrl, `Loyverse error: , ${e}`);

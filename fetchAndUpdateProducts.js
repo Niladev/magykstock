@@ -17,8 +17,7 @@ export const getUpdatedItems = () => updatedItems;
 async function getSquarespaceItems() {
   let squarespaceItems = [];
   console.log(`Requesting squarespace items`);
-  await fetchSquarespaceItems(squarespaceItems);
-
+  squarespaceItems = await fetchSquarespaceItems(squarespaceItems);
   return squarespaceItems;
 }
 
@@ -26,7 +25,7 @@ async function getLoyverseItems() {
   let loyverseItems = [];
 
   console.log(`Requesting loyverse items`);
-  await fetchLoyverseItems(loyverseItems);
+  loyverseItems = await fetchLoyverseItems(loyverseItems);
 
   return loyverseItems;
 }
@@ -93,9 +92,9 @@ async function updateItems() {
     //   console.log(squarespaceItems.length);
     const filteredItems = [];
     loyverseItems.forEach((lItem) => {
-      const item = squarespaceItems.find(
-        (sItem) => sItem.sku.toUpperCase() === lItem.sku.toUpperCase()
-      );
+      const item = squarespaceItems.find((sItem) => {
+        return sItem.sku.toUpperCase() === lItem.sku.toUpperCase();
+      });
 
       if (item) {
         filteredItems.push({

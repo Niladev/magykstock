@@ -16,6 +16,7 @@ export const fetchSquarespaceItems = async (squarespaceItems, cursor) => {
       }
     );
 
+    console.log(`Squarespace Request with status - ${res.status}`);
     const data = await res.json();
 
     if (res.status !== 200) {
@@ -41,6 +42,7 @@ export const fetchSquarespaceItems = async (squarespaceItems, cursor) => {
         }))
       );
       squarespaceFullItems = squarespaceFullItems.concat(data.inventory);
+      console.log(`Squarespace item length`, squarespaceItems.length);
       if (data.pagination.hasNextPage) {
         return fetchSquarespaceItems(
           squarespaceItems,
@@ -48,6 +50,8 @@ export const fetchSquarespaceItems = async (squarespaceItems, cursor) => {
         );
       }
     }
+
+    return squarespaceItems;
   } catch (e) {
     console.error(e);
     await sendSlackMessage(webhookUrl, `Squarespace error: , ${e}`);
